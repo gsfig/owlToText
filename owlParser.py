@@ -1,31 +1,36 @@
 import rdflib
-from makeDB import MakeDB
+from abstractmodel import AbstractModel
+
+
+def remove_string(to_edit):
+    subject_to_remove = 'http://www.radlex.org/RID/#'
+    return to_edit.replace(subject_to_remove, '')
 
 
 def parse():
-    owlFile = "Radlex3.14.owl"
+    owl_file = "RadlexSmall.owl"
     g = rdflib.Graph()
-    g.load(owlFile)
-    db = MakeDB()
-    db.connect()
-    db.createDB()
+    g.load(owl_file)
+
+    m = AbstractModel()
     i = 0
     for subject, predicate, obj in g:
         if "Preferred_name" in predicate:
-            print(i + " pred " + str(subject) + " " + str(predicate) + " " + str(obj))
-            db.add(str(subject), str(predicate), str(obj))
-            db.connection.commit()
-            i+=1
+            # print(str(i) + " pref " + remove_string(str(subject)) + " " + str(predicate) + " " + str(obj))
+            m.add_name(remove_string(str(subject)), remove_string(str(obj)))
 
+        elif "Synonym" in predicate:
+            #print(str(i) + " syn " + remove_string(str(subject)) + " " + str(predicate) + " " + str(obj))
+            m.add_syn(remove_string(str(subject)), remove_string(str(obj)))
+
+        i+=1
     print("end ")
 
-    db.add("http://www.radlex.org/RID/#RID39426", "http://www.radlex.org/RID/#Preferred_name ", "muscle of iris")
-    db.connection.commit()
+    filename = 'this.txt'
+    m.save(filename)
 
-    db.add("http://www.radlex.org/RID/#RID39426", "http://www.radlex.org/RID/#Preferred_name ", "muscle of iris")
-    db.connection.commit()
 
-    db.connection.close()
+
 
 
 if __name__ == '__main__':
