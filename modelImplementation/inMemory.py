@@ -3,6 +3,7 @@
 class InMemoryObject:
     def __init__(self):
         self.pref_name = None
+        self.obsolete_name = None
         self.id = None
         self.synonyms = list()
 
@@ -47,14 +48,42 @@ class InMemoryObject:
                 s += l + "\t"
             return self.pref_name + "\t" + s
 
+        if self.obsolete_name and self.synonyms:
+            s = ''
+            for l in self.synonyms:
+                s += l + "\t"
+            return self.obsolete_name + "\t" + s
+
+        if not self.synonyms and self.obsolete_name:
+            self.synonyms.append('')
+            return self.obsolete_name + "\t" + ''
+
+        if not self.synonyms and self.pref_name:
+            self.synonyms.append('')
+            return self.pref_name + "\t" + ''
+
+        if self.synonyms and not self.pref_name and not self.obsolete_name:
+            s = ''
+            for l in self.synonyms:
+                s+=l
+            return self.id + "\t" + s
+
         if self.synonyms and not self.pref_name:
             s = ''
             for l in self.synonyms:
                 s+=l
+            print("ERROR: no name, number of l: "+ str(self.synonyms.__len__()) + "l: " + s)
             return "no name, number of l: " + str(self.synonyms.__len__()) + "l: " + s
 
-        if not self.synonyms and self.pref_name:
-            return "no syn " + "name " + self.pref_name
+    def is_obsolete(self):
+        if self.obsolete_name and not self.pref_name:
+            return True
+        elif self.obsolete_name and self.pref_name:
+            return True
+        elif not self.obsolete_name and not self.pref_name:
+            return False # but outputs RID as pref_name
+        return False
+
 
 #    def print(self):
 #        print("id: " + self.id + " " + self.pref_name + " " + self.synonyms)
@@ -82,9 +111,17 @@ class ModelMemory:
             o = InMemoryObject()
             o.id = subj
             self.data[subj] = o
-        o.synonyms.append(obj)
         o.pref_name = obj
         #print("s: " + subj + " name: " + o.pref_name)
+
+    def add_obsolete_name(self, subj, obj):
+        if subj in self.data:
+            o = self.data.get(subj)
+        else:
+            o = InMemoryObject()
+            o.id = subj
+            self.data[subj] = o
+        o.obsolete_name = obj
 
     def print(self):
         #print("printing everything: " + str(self.data.__len__()))
@@ -94,22 +131,25 @@ class ModelMemory:
 
     def save(self, filename):
         headers = ['RID', 'prefered_name', 'Synonyms']
+        headersobs = ['RID', 'obsolete_name', 'Synonyms']
         f = open(filename, 'w')
+        obs = open("obsolete.txt", 'w')
         f.write('\t'.join(headers) + '\n')
+        obs.write('\t'.join(headersobs) + '\n')
         for k, v in self.data.items():
-            print(k)
-            f.write(k)
-            f.write('\t')
-            #print(v, file=filename)
-
-            f.writelines(v.sting_output())
-
-            f.write('\n')
+            if v.is_obsolete():
+                obs.write(k)
+                obs.write('\t')
+                obs.writelines(v.sting_output())
+                obs.write('\n')
+            else:
+                f.write(k)
+                f.write('\t')
+                f.writelines(v.sting_output())
+                f.write('\n')
         f.close()
+        obs.close()
 
-
-
-    # no need. dictionary does update with or without existing (key,value) pair.
     def check_exists(self, id):
         raise NotImplementedError("error message")
 

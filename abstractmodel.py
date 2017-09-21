@@ -10,6 +10,9 @@ class AbstractModel:
     def add_syn(self, subj, obj):
         self.m.add_syn(subj, obj)
 
+    def add_obsolete_name(self, subj, obj):
+        self.m.add_obsolete_name(subj, obj)
+
     def check_exists(self, id):
         self.m.check_exists(id)
 
