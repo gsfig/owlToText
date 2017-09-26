@@ -1,0 +1,33 @@
+{
+  "owl_file" : "Radlex3.14.owl",
+  "out_filename": "radlex3.14Out.txt",
+  "lexicon_filename" : "lexiconRadlex.txt",
+  "tags_to_extract_in_predicate" : [
+      "Preferred_name",
+      "Synonym",
+      "Preferred_Name_for_Obsolete",
+      "UMLS_Term",
+      "SNOMED_Term"
+  ],
+  "part_of_tag_to_remove_in_subject" : "http://www.radlex.org/RID/#",
+  "chars_to_remove" : [
+      "\""
+  ],
+  "chars_to_remove_beguining":[
+    "'"
+  ],
+  "files_to_print_data" :{
+      "pref_name":[
+        "ID",
+        "Preferred_name",
+        "Synonym"
+      ],
+      "obsolete" :[
+        "ID",
+        "Preferred_Name_for_Obsolete",
+        "Synonym"
+      ]
+}
+
+
+}
