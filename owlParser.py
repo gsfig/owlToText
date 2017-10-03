@@ -1,7 +1,6 @@
 import rdflib
 import json
-import re
-
+import sqlite3
 from abstractmodel import AbstractModel
 
 
@@ -10,67 +9,82 @@ def remove_string(to_edit):
     return to_edit.replace(subject_to_remove, '')
 
 
-def parse():
-    #TODO: try to add "label" to list to extract and then add in list of what to Print
+def parse(m):
+    # TODO: try to add "label" to list to extract and then add in list of what to Print
     with open('config.json') as data_file:
         config = json.load(data_file)
 
-    #pprint(config)
+    print(config)
 
     g = rdflib.Graph()
     g.load(config["owl_file"])
-    m = AbstractModel()
+    # m = AbstractModel()
     for subject, predicate, obj in g:
         for tag in config["tags_to_extract_in_predicate"]:
             if tag in predicate:
-                m.add(remove_string(str(subject)), remove_string(str(obj)), tag)
+                m.addinMemory(remove_string(str(subject)), remove_string(str(obj)), tag)
+    # m.print_to_file(config["out_filename"])
 
-    m.print(config["out_filename"])
-
-
-def printPredicates():
-    with open('config.json') as data_file:
-        config = json.load(data_file)
-    g = rdflib.Graph()
-    g.load(config["owl_file"])
-    pred = list()
-    i = 0
-    for subject, predicate, obj in g:
-        if predicate not in pred:
-            pred.append(predicate)
-            print(str(predicate))
-            i+=1
-    print("has " + str(i) + " predicates")
+    # m.print(config["out_filename"])
 
 
-def appendNamesForNer():
-    with open('config.json') as data_file:
-        config = json.load(data_file)
-    file_read = config["out_filename"]
-    filename = config["lexicon_filename"]
-    filewrite = open(filename, "w")
-    with open(file_read, "r") as read:
-        json_read = json.load(read)
+def testdb(config):
+    db_name = config["db_name"]
+    connection = sqlite3.connect(db_name)
 
-    out = list()
+    r = connection.execute('''SELECT COUNT(*) FROM owlEntity''')
+    p(r, "owlEntities")
+    r = connection.execute('''SELECT COUNT(*) FROM Preferred_name''')
+    p(r, "Preferred_name")
+    r = connection.execute('''SELECT COUNT(*) FROM Synonym''')
+    p(r, "Synonym")
+    r = connection.execute('''SELECT COUNT(*) FROM Preferred_Name_for_Obsolete''')
+    p(r, "Preferred_Name_for_Obsolete")
+    r = connection.execute('''SELECT COUNT(*) FROM SNOMED_Term''')
+    p(r, "SNOMED_Term")
+    r = connection.execute('''SELECT COUNT(*) FROM UMLS_Term''')
+    p(r, "UMLS_Term")
 
-    for rid in json_read:
-        for tag in json_read[rid]:
-            for item in json_read[rid][tag]:
-                #out.append(item + " " + rid + " " +tag)
-                out.append(item)
+    connection.close()
 
-    out.sort()
-    for s in out:
-        filewrite.write(s)
-        filewrite.write("\n")
 
-    data_file.close()
-    read.close()
-    filewrite.close()
+def p(rows, s):
+    print(s)
+    for row in rows:
+        for ritem in row:
+            print(ritem)
+
+
+def from_file(config_f, m):
+
+    with open(config_f["out_filename"]) as file:
+        data = json.load(file)
+
+    for id in data:
+        for tag in data[id]:
+            for item in data[id][tag]:
+                print(id + " " + item + " " + tag)
+                m.addinMemory(str(id), str(item), tag)
 
 
 if __name__ == '__main__':
-    #printPredicates()
-    parse()
-    appendNamesForNer()
+    with open('config.json') as config_file:
+        config = json.load(config_file)
+
+    models = AbstractModel()
+
+    # from_file(config, models)
+    # m.printPredicates()
+    #parse(models)
+    #models.print_to_file(config["out_filename"])
+    # models.save_to_db()
+
+    testdb(config)
+
+    #models.close_connection()
+
+
+
+
+
+    # m.appendNamesForNer()

@@ -8,14 +8,14 @@
       "Preferred_Name_for_Obsolete",
       "UMLS_Term",
       "SNOMED_Term"
-  ],
+      ],
   "part_of_tag_to_remove_in_subject" : "http://www.radlex.org/RID/#",
   "chars_to_remove" : [
       "\""
-  ],
-  "chars_to_remove_beguining":[
-    "'"
-  ],
+      ],
+  "chars_to_remove_beginning":[
+      "'"
+      ],
   "files_to_print_data" :{
       "pref_name":[
         "ID",
@@ -27,7 +27,8 @@
         "Preferred_Name_for_Obsolete",
         "Synonym"
       ]
-}
+  },
+  "db_name": "radlex.db"
 
 
 }

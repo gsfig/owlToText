@@ -1,12 +1,21 @@
 import re
-import json
 
 
 # subject is key
-class ModelMemory:
+class ModelinMemory:
     data = dict()
 
     def add(self, subj, obj, tag):
+        """
+        adds subject, object and predicate to data structure
+
+        guarantees subjects are unique
+
+        :param subj:
+        :param obj:
+        :param tag:
+        :return: Nothing
+        """
         if subj in self.data:
             o = self.data.get(subj)
         else:
@@ -24,12 +33,6 @@ class ModelMemory:
         o[tag].append(s)
         self.data[subj] = o
 
-    def print(self, filename):
-        f = open(filename, 'w')
-        #f.write(str(self.data))
-        json.dump(self.data, f)
-        #pprint(self.data)
-        f.close()
 
     def check_exists(self, id):
         raise NotImplementedError("error message")
