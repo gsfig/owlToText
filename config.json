@@ -1,10 +1,15 @@
 {
   "files_path" : "files/",
   "database_path" : "database/",
+
   "owl_file" : "RadlexSmall.owl",
+
   "output_path" : "out_files/",
+
   "out_filename": "radlexSmallOut.txt",
+
   "lexicon_filename" : "lexiconRadlexSmall.txt",
+
   "tags_to_extract_in_predicate" : [
       "Preferred_name",
       "Synonym",
@@ -12,7 +17,9 @@
       "UMLS_Term",
       "SNOMED_Term"
       ],
+
   "part_of_tag_to_remove_in_subject" : "http://www.radlex.org/RID/#",
+
   "chars_to_remove" : [
       "\""
       ],

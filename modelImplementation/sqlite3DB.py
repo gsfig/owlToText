@@ -1,4 +1,3 @@
-import json
 import sqlite3
 from os.path import isfile, getsize
 
