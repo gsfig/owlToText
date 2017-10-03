@@ -2,21 +2,17 @@ import rdflib
 import json
 
 
-class ModeltoFile:
+class ModelinFile:
 
-    def print_to_file(self, data, filename):
+    def print_to_json_file(self, data, filename):
         f = open(filename, 'w')
-        #f.write(str(self.data))
         json.dump(data, f)
-        #pprint(self.data)
         f.close()
-        print("end printing to file: " + str(filename))
+        print("end print to file: " + str(filename))
 
-    def printPredicates(self):
-        with open('config.json') as data_file:
-            config = json.load(data_file)
+    def printPredicates(self, owl_file):
         g = rdflib.Graph()
-        g.load(config["owl_file"])
+        g.load(owl_file)
         pred = list()
         i = 0
         for subject, predicate, obj in g:
@@ -26,12 +22,8 @@ class ModeltoFile:
                 i += 1
         print("has " + str(i) + " predicates")
 
-    def appendNamesForNer(self):
-        with open('config.json') as data_file:
-            config = json.load(data_file)
-        file_read = config["out_filename"]
-        filename = config["lexicon_filename"]
-        filewrite = open(filename, "w")
+    def appendNamesForNer(self, file_read, file_to):
+        filewrite = open(file_to, "w")
         with open(file_read, "r") as read:
             json_read = json.load(read)
 
@@ -40,14 +32,14 @@ class ModeltoFile:
         for rid in json_read:
             for tag in json_read[rid]:
                 for item in json_read[rid][tag]:
-                    # out.append(item + " " + rid + " " +tag)
                     out.append(item)
-
         out.sort()
         for s in out:
             filewrite.write(s)
             filewrite.write("\n")
 
-        data_file.close()
         read.close()
         filewrite.close()
+
+        print("end print to file: " + file_to)
+

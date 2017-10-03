@@ -1,7 +1,10 @@
 {
-  "owl_file" : "Radlex3.14.owl",
-  "out_filename": "radlex3.14Out.txt",
-  "lexicon_filename" : "lexiconRadlex.txt",
+  "files_path" : "files/",
+  "database_path" : "database/",
+  "owl_file" : "RadlexSmall.owl",
+  "output_path" : "out_files/",
+  "out_filename": "radlexSmallOut.txt",
+  "lexicon_filename" : "lexiconRadlexSmall.txt",
   "tags_to_extract_in_predicate" : [
       "Preferred_name",
       "Synonym",
@@ -28,7 +31,7 @@
         "Synonym"
       ]
   },
-  "db_name": "radlex.db"
+  "db_name": "radlex.sqlite"
 
 
 }

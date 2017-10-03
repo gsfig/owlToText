@@ -1,18 +1,20 @@
 import json
 import sqlite3
+from os.path import isfile, getsize
 
 
 class ModeltoDB:
     db_name = ''
     connection = ''
 
-    #def __init__(self):
-        #self.create()
+    def __init__(self, db):
+        self.db_name = db
 
-    def create(self):
+    def create(self, predicate_list):
 
-        with open('config.json') as config_file:
-            config = json.load(config_file)
+        print("creating database")
+
+        self.connection = sqlite3.connect(self.db_name)
 
         self.connection.isolation_level = None  # auto_commit
         c = self.connection.cursor()
@@ -26,8 +28,7 @@ class ModeltoDB:
                   name   VARCHAR(100) UNIQUE
                   )''')
 
-
-        for tag in config["tags_to_extract_in_predicate"]:
+        for tag in predicate_list:
             self.connection.execute('''
                               DROP TABLE IF EXISTS '%s'
                               ''' % tag)
@@ -44,7 +45,7 @@ class ModeltoDB:
 
         for name in data:
             self.connection.execute('''
-                  INSERT INTO owlEntity(name) VALUES (?)''', (name,))
+                  INSERT OR IGNORE INTO owlEntity(name) VALUES (?)''', (name,))
             self.connection.commit()
             rows = self.connection.execute('SELECT id FROM owlEntity WHERE name = ?', (name,))
             for row in rows:
@@ -55,23 +56,24 @@ class ModeltoDB:
                     self.connection.execute(''' INSERT INTO '''+table_name_col+''' VALUES (?,?)''', (item, entry,))
                     self.connection.commit()
 
+        print("saved data to " + self.db_name)
+
     def connect_existing(self):
-        with open('config.json') as config_file:
-            config = json.load(config_file)
-        self.db_name = config["db_name"]
-        self.connection = sqlite3.connect(self.db_name)
+        if isfile(self.db_name):
+            if getsize(self.db_name) > 100:
+                with open(self.db_name, 'r', encoding="ISO-8859-1") as f:
+                    header = f.read(100)
+                    if header.startswith('SQLite format 3'):
+                        self.connection = sqlite3.connect(self.db_name)
+                        print("SQLite3 database has been detected.")
+                        return True
+
+        else:
+            print("no database detected")
+            return False
 
     def close_connection(self):
         self.connection.close()
 
     def check_exists(self, id):
-        raise NotImplementedError("error message")
-
-    def print(self, filename):
-        raise NotImplementedError("error message")
-
-    def printPredicates(self):
-        raise NotImplementedError("error message")
-
-    def appendNamesForNer(self):
         raise NotImplementedError("error message")
